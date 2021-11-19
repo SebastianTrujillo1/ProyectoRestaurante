@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entidades;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace CapaAccesoDatos
+{
+    public class MenusAD
+    {
+        public List<MenuEntidad> GetAll()
+        {
+            List<MenuEntidad> list = new List<MenuEntidad>();
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"SELECT lIdMenu, sNombreComida, lPrecioUnitario, sDescripcion FROM BY lCiAdmin";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(LoadMenu(reader));
+                }
+            }
+            return list;
+        }
+        public bool Exist(int id)
+        {
+            int nrorecord = 0;
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"SELECT Count(*) FROM tblMenus WHERE lIdMenu= @lidmenu";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("lidmenu", id);
+                nrorecord = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            return nrorecord > 0;
+        }
+
+        public MenuEntidad Create(MenuEntidad menu)
+        {
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"INSERT INTO tblMenus (lIdMenu, sNombreComidas, lPrecioUnitario, sDescripcion)
+                                values(@lidMenus, @snombreComidas, @lPrecioUnitario, @sdescripcion)
+                                SELECT SCOPE_IDENTITY()";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@lidMenu", menu.lIdMenu);
+                cmd.Parameters.AddWithValue("@snombreComidas", menu.sNombreComidas);
+                cmd.Parameters.AddWithValue("@lPrecioUnitario", menu.lPrecioUnitario);
+                cmd.Parameters.AddWithValue("@sdescripcion", menu.sDescripcion);
+                cmd.ExecuteNonQuery();
+            }
+            return menu;
+        }
+
+        public MenuEntidad Update(MenuEntidad menu)
+        {
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"UPDATE tblMenus SET                                      
+                                        sNombreComidas=@snombreComidas,
+                                        lPrecioUnitario=@lprecioUnitario,
+                                        sDescripcion=@sdescripcion,
+                                        WHERE lIdMenu=@lidMenu";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@lidMenu", menu.lIdMenu);
+                cmd.Parameters.AddWithValue("@snombreComidas", menu.sNombreComidas);
+                cmd.Parameters.AddWithValue("@sdescripcion", menu.sDescripcion);
+                cmd.Parameters.AddWithValue("@lprecioUnitario", menu.lPrecioUnitario);
+                cmd.ExecuteNonQuery();
+            }
+            return menu;
+        }
+        private MenuEntidad LoadMenu(IDataReader reader)
+        {
+            MenuEntidad menu = new MenuEntidad();
+
+            menu.lIdMenu = Convert.ToInt32(reader["lIdMenu"]);
+            menu.lPrecioUnitario = Convert.ToInt32(reader["lPrecioUnitario"]);
+            menu.sNombreComidas = Convert.ToString(reader["sNombreComidas"]);
+            menu.sDescripcion = Convert.ToString(reader["sDescripcion"]);
+            return menu;
+        }
+
+
+
+    }
+}
