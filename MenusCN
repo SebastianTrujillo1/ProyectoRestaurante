@@ -1,0 +1,43 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entidades;
+using CapaAccesoDatos;
+using System.Transactions;
+
+namespace CapaNegocios
+{
+    class MenusCN
+    {
+        private MenusAD menusAD = new MenusAD();
+
+        public List<MenuEntidad> GetAll()
+        {
+            return menusAD.GetAll();
+        }
+        public void CreateInvoice(MenuEntidad menu)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                menusAD.Create(menu);
+
+                menusAD.Update(menu);
+
+                scope.Complete();
+            }
+        }
+        public MenuEntidad SaveCustomer(MenuEntidad menu)
+        {
+            if (menusAD.Exist(menu.lIdMenu))
+            {
+                return menusAD.Update(menu);
+            }
+            else
+            {
+                return menusAD.Update(menu);
+            }
+        }
+    }
+}
