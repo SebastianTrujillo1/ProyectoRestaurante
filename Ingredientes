@@ -1,0 +1,61 @@
+usando el  sistema ;
+utilizando  System . Colecciones . Genérico ;
+utilizando  System . Datos ;
+utilizando  System . Datos . SqlClient ;
+utilizando  System . Linq ;
+utilizando  System . Texto ;
+utilizando  System . Enhebrado . Tareas ;
+usando  Entidades ;
+
+espacio de nombres  CapaAccesoDatos
+{
+    clase  IngredientesAD
+    {
+        /// < resumen >
+        /// Busca Ingredientes por su ID
+        /// </ resumen >
+        /// < param  name = " id " > </ param >
+        /// < devoluciones > </ devoluciones >
+        public  IngredientesEntidad  BuscarPorId ( int  id )
+        {
+            IngredientesEntidad  ingrediente  =  null ;
+            usando ( SqlConnection  conn  =  new  SqlConnection ( ConexionSQL . ObtenerCadenaConexion ()))
+            {
+                conn . Abrir ();
+
+                string  sql  =  @ " SELECT lIdIngrediente, lIdComida, sNombreIngr
+                                DESDE tblIngredientes 
+                                DONDE lIdIngrediente = @lIdIngrediente " ;
+
+                SqlCommand  cmd  =  nuevo  SqlCommand ( sql , conn );
+                cmd . Parámetros . AddWithValue ( " lIdIngrediente " , id );
+
+                 Lector  SqlDataReader =  cmd . ExecuteReader ();
+
+                si ( lector . Leer ())
+                {
+                    ingrediente  =  CargarIngredientes ( lector );
+                }
+            }
+
+            devolver el  ingrediente ;
+        }
+
+        /// < resumen >
+        /// Auxiliar
+        /// </ resumen >
+        /// < param  name = " reader " > </ param >
+        /// < devoluciones > </ devoluciones >
+        privado  IngredientesEntidad  CargarIngredientes ( lector IDataReader  )
+        {
+            IngredientesEntidad  ingrediente  =  new  IngredientesEntidad ();
+
+            ingrediente . lIdIngrediente  =  Convertir . ToInt32 ( lector [ " lIdIngrediente " ]);
+            ingrediente . sNombreIngr  =  Convertir . ToString ( lector [ " sNombreIngr " ]);
+            ingrediente . lIdComida  =  Convertir . ToInt32 ( lector [ " lIdComida " ]);
+
+
+            devolver el  ingrediente ;
+        }
+    }
+}
