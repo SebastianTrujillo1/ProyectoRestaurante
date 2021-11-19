@@ -1,0 +1,40 @@
+usando el  sistema ;
+utilizando  System . Colecciones . Genérico ;
+utilizando  System . Linq ;
+utilizando  System . Texto ;
+utilizando  System . Enhebrado . Tareas ;
+usando  Entidades ;
+utilizando  System . Datos . SqlClient ;
+
+espacio de nombres  CapaAccesoDatos
+{
+    clase  DetalleVentaAD
+    {
+        public  void  CrearDetalleVenta ( DetalleVentaEntidad  detalleVenta )
+        {
+            usando ( SqlConnection  conn  =  new  SqlConnection ( ConexionSQL . ObtenerCadenaConexion ()))
+            {
+                conn . Abrir ();
+
+                string  sqlDetalleV  =  @ " INSERT INTO tblDetalleVenta (lIdVenta, lCantidad_Platos2,
+                                         lPrecio_Subtotal, lPrecio_Total, 
+                                         sDescripcionV) VALORES (@lIdVenta, @) lDescuento, 
+                                         @ lCantidad_Platos2, @lPrecio_Subtotal, @lPrecio_Total
+                                         @sDescripcionV) SELECT SCOPE_IDENTITY () " ;
+
+                usando ( SqlCommand  cmd =  new  SqlCommand ( sqlDetalleV , conn ))
+                {
+                    cmd . Parámetros . AddWithValue ( " @lIdVenta " , detalleVenta . LIdVenta );
+                    cmd . Parámetros . AddWithValue ( " @ lCantidad_Platos2 " , detalleVenta . LCantidad_Platos2 );
+                    cmd . Parámetros . AddWithValue ( " @lPrecio_Subtotal " , detalleVenta . LPrecio_Subtotal );
+                    cmd . Parámetros . AddWithValue ( " @lPrecio_Total " , detalleVenta . LPrecio_Total );
+                    cmd . Parámetros . AddWithValue ( " @sDescripcionV " , detalleVenta . SDescripcionV );
+
+                    detalleVenta . lIdVenta  =  Convertir . ToInt32 ( cmd . ExecuteScalar ());
+                }
+
+                string  sqlLineaDetalle  =  @ " INSERT INTO "
+            }
+        }
+    }
+}
