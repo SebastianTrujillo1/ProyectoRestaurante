@@ -1,0 +1,90 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entidades;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace CapaAccesoDatos
+{
+    public class AdministradorAD
+    {
+        public List<AdministradorEntidad> GetAll()
+        {
+            List<AdministradorEntidad> list = new List<AdministradorEntidad>();
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"SELECT lIdAdmin, lCiAdmin, sNombreA FROM BY lCiAdmin";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(LoadAdmin(reader));
+                }
+            }
+            return list;
+        }
+
+        public bool Exist(int id)
+        {
+            int nrorecord = 0;
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"SELECT Count(*) FROM tblAdministrador WHERE lAdmin= @ladmin";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("ladmin", id);
+                nrorecord = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            return nrorecord > 0;
+        }
+
+        public AdministradorEntidad Create(AdministradorEntidad admin)
+        {
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"INSERT INTO tblAdministrador (lIdAdmin, lCiAdmin, sNombreA)
+                                values(@lidadmin, @lciadmin, @snombre)
+                                SELECT SCOPE_IDENTITY()";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@lidadmin", admin.lIdAdmin);
+                cmd.Parameters.AddWithValue("@lciadmin", admin.sCiAdmin);
+                cmd.Parameters.AddWithValue("@snombre", admin.sNombreA);
+                cmd.ExecuteNonQuery();
+            }
+            return admin;
+        }
+
+        public AdministradorEntidad Update(AdministradorEntidad administrador)
+        {
+            using (SqlConnection conn = new SqlConnection(ConexionSQL.ObtenerCadenaConexion()))
+            {
+                conn.Open();
+                string sql = @"UPDATE tblAdministrador SET                                      
+                                        lCiAdmin=@lciadmin,
+                                        sNombreA=@snombre,
+                                        WHERE lIdAdmin= @lidAdmin";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@lciadmin", administrador.sCiAdmin);
+                cmd.Parameters.AddWithValue("@snombre", administrador.sNombreA);
+                cmd.Parameters.AddWithValue("@lidAdmin", administrador.lIdAdmin);
+                cmd.ExecuteNonQuery();
+            }
+            return administrador;
+        }
+
+        private AdministradorEntidad LoadAdmin(IDataReader reader)
+        {
+            AdministradorEntidad admin = new AdministradorEntidad();
+
+            admin.lIdAdmin = Convert.ToInt32(reader["lIdAdmin"]);
+            admin.sCiAdmin = Convert.ToString(reader["lCiadmin"]);
+            admin.sNombreA = Convert.ToString(reader["sNombreA"]);
+            return admin;
+        }
+    }
+}
