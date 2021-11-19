@@ -1,0 +1,43 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Entidades;
+using CapaAccesoDatos;
+using System.Transactions;
+
+namespace CapaNegocios
+{
+    class MeseroCN
+    {
+        private MeseroAD meseroAD = new MeseroAD();
+
+        public List<MeseroEntidad> GetAll()
+        {
+            return meseroAD.GetAll();
+        }
+        public void CreateInvoice(MeseroEntidad mesero)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                meseroAD.Create(mesero);
+
+                meseroAD.Update(mesero);
+
+                scope.Complete();
+            }
+        }
+        public MeseroEntidad SaveCustomer(MeseroEntidad mesero)
+        {
+            if (meseroAD.Exist(mesero.lIdMesero))
+            {
+                return meseroAD.Update(mesero);
+            }
+            else
+            {
+                return meseroAD.Update(mesero);
+            }
+        }
+    }
+}
