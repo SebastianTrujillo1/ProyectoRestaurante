@@ -1,0 +1,45 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data;
+using System.Data.SqlClient;
+using Entidades;
+using CapaAccesoDatos;
+using System.Transactions;
+
+namespace CapaNegocios
+{
+    public class AdministradorCN
+    {
+        private AdministradorAD AdministradorAD = new AdministradorAD();
+
+        public List<AdministradorEntidad> GetAll()
+        {
+            return AdministradorAD.GetAll();
+        }
+        public void CreateInvoice(AdministradorEntidad administrador)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+               AdministradorAD.Create(administrador);
+
+                AdministradorAD.Update(administrador);
+
+                scope.Complete();
+            }
+        }
+        public AdministradorEntidad SaveCustomer(AdministradorEntidad administrador)
+        {
+            if (AdministradorAD.Exist(administrador.lIdAdmin))
+            {
+                return AdministradorAD.Update(administrador);
+            }
+            else
+            {
+                return AdministradorAD.Update(administrador);
+            }
+        }
+    }
+}
